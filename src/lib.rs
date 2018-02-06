@@ -36,13 +36,25 @@ impl AirlyClient {
         }
     }
 
-    /// Returns measurements for a specific sensor.
+    /// Returns specific sensor's information (like its address and so on).
     ///
     /// # Example
     ///
     /// ```rust
-    /// let sensor = airly.get_nearest_sensor(50.0, 19.0);
-    /// println!("{:#?}", airly.get_sensor_measurements(sensor.id));
+    /// println!("{:#?}", airly.get_sensor(984));
+    /// ```
+    pub fn get_sensor(&self, sensor_id: u32)
+        -> Result<models::sensor::Sensor, models::Error>
+    {
+        self.execute(format!("sensors/{}", sensor_id), vec![])
+    }
+
+    /// Returns specific sensor's measurements (like PM10 level and so on).
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// println!("{:#?}", airly.get_sensor_measurements(984));
     /// ```
     ///
     /// # Errors
@@ -51,7 +63,7 @@ impl AirlyClient {
     /// 2. May fail when an invalid API key was specified.
     pub fn get_sensor_measurements(&self, sensor_id: u32)
         -> Result<models::measurements::Measurements, models::Error> {
-        self.execute("sensor/measurements", vec![
+        self.execute("sensor/measurements".to_string(), vec![
             ("sensorId", &sensor_id.to_string()),
         ])
     }
@@ -70,7 +82,7 @@ impl AirlyClient {
     /// 2. May fail when an invalid API key was specified.
     pub fn get_nearest_sensor(&self, latitude: f32, longitude: f32)
         -> Result<models::sensor::Sensor, models::Error> {
-        self.execute("nearestSensor/measurements", vec![
+        self.execute("nearestSensor/measurements".to_string(), vec![
             ("latitude", &latitude.to_string()),
             ("longitude", &longitude.to_string()),
         ])
@@ -88,12 +100,12 @@ impl AirlyClient {
     ///   ("secondParameter", "secondParameterValue"),
     /// ]);
     /// ```
-    pub fn execute<T: serde::de::DeserializeOwned>(self: &AirlyClient, action: &'static str, params: Parameters)
+    pub fn execute<T: serde::de::DeserializeOwned>(self: &AirlyClient, action: String, params: Parameters)
         -> Result<T, models::Error> {
         use reqwest::Url;
 
         // prepare the request URL
-        let mut request_url = Url::parse((self.url.clone() + "/" + action).borrow()).unwrap();
+        let mut request_url = Url::parse(format!("{}/{}", self.url, action).borrow()).unwrap();
 
         // prepare the request parameters
         {
