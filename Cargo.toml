@@ -1,9 +1,9 @@
 [package]
-name = "pwr_airly"
+name = "pwr-airly"
 description = "A simple Rust client for the Airly API (https://developer.airly.eu/docs)"
 authors = ["Patryk Wychowaniec <wychowaniec.patryk@gmail.com>"]
 license = "MIT"
-version = "0.0.1"
+version = "0.0.2"
 repository = "https://github.com/Patryk27/pwr-airly"
 maintenance = { status = "experimental" }
 
