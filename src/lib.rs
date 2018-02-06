@@ -43,13 +43,38 @@ impl AirlyClient {
     /// ```rust
     /// println!("{:#?}", airly.get_sensor(984));
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// 1. May fail when given invalid sensor id.
+    /// 2. May fail when an invalid API key was specified.
     pub fn get_sensor(&self, sensor_id: u32)
         -> Result<models::sensor::Sensor, models::Error>
     {
         self.execute(format!("sensors/{}", sensor_id), vec![])
     }
 
-    /// Returns specific sensor's measurements (like PM10 level and so on).
+    /// Returns a sensor located nearest to given location.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// println!("{:#?}", airly.get_nearest_sensor(50.0, 19.0).unwrap());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// 1. May fail when given invalid coordinates or no sensor is found near given location.
+    /// 2. May fail when an invalid API key was specified.
+    pub fn get_nearest_sensor(&self, latitude: f32, longitude: f32)
+        -> Result<models::sensor::Sensor, models::Error> {
+        self.execute("nearestSensor/measurements".to_string(), vec![
+            ("latitude", &latitude.to_string()),
+            ("longitude", &longitude.to_string()),
+        ])
+    }
+
+    /// Returns measurements for a specified sensor.
     ///
     /// # Example
     ///
@@ -68,21 +93,21 @@ impl AirlyClient {
         ])
     }
 
-    /// Returns a sensor located nearest to given location.
+    /// Returns measurements for a specified point on the map.
     ///
     /// # Example
     ///
     /// ```rust
-    /// println!("{:#?}", airly.get_nearest_sensor(50.0, 19.0).unwrap());
+    /// println!("{:#?}", airly.get_map_point_measurements(50.06, 19.93));
     /// ```
     ///
     /// # Errors
     ///
-    /// 1. May fail when given invalid coordinates or no sensor is found near given location.
+    /// 1. May fail when passed an invalid coordinates.
     /// 2. May fail when an invalid API key was specified.
-    pub fn get_nearest_sensor(&self, latitude: f32, longitude: f32)
-        -> Result<models::sensor::Sensor, models::Error> {
-        self.execute("nearestSensor/measurements".to_string(), vec![
+    pub fn get_map_point_measurements(&self, latitude: f32, longitude: f32)
+        -> Result<models::measurements::Measurements, models::Error> {
+        self.execute("mapPoint/measurements".to_string(), vec![
             ("latitude", &latitude.to_string()),
             ("longitude", &longitude.to_string()),
         ])
