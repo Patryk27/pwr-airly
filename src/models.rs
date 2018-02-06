@@ -1,3 +1,8 @@
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Error {
+    pub message: String,
+}
+
 pub mod sensor {
     #[derive(Debug, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]

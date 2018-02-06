@@ -4,10 +4,10 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-pub mod models;
-
-use reqwest::{Client, Response};
+use reqwest::Client;
 use std::borrow::Borrow;
+
+pub mod models;
 
 pub struct AirlyClient {
     url: String,
@@ -47,11 +47,12 @@ impl AirlyClient {
     /// # Errors
     ///
     /// May fail when given invalid coordinates or no sensor is found near given location.
-    pub fn get_nearest_sensor(self: &AirlyClient, latitude: f32, longitude: f32) -> models::sensor::Sensor {
+    pub fn get_nearest_sensor(self: &AirlyClient, latitude: f32, longitude: f32)
+        -> Result<models::sensor::Sensor, models::Error> {
         self.execute("nearestSensor/measurements", vec![
             ("latitude", &latitude.to_string()),
             ("longitude", &longitude.to_string()),
-        ]).json().unwrap()
+        ])
     }
 
     /// Get measurements for a specific sensor.
@@ -66,10 +67,11 @@ impl AirlyClient {
     /// # Errors
     ///
     /// May fail when passed a non-existing sensor's id.
-    pub fn get_sensor_measurements(self: &AirlyClient, sensor_id: u32) -> models::measurements::Measurements {
+    pub fn get_sensor_measurements(self: &AirlyClient, sensor_id: u32)
+        -> Result<models::measurements::Measurements, models::Error> {
         self.execute("sensor/measurements", vec![
             ("sensorId", &sensor_id.to_string()),
-        ]).json().unwrap()
+        ])
     }
 
     /// Execute request and return response.
@@ -82,7 +84,8 @@ impl AirlyClient {
     ///   ("secondParameter", "secondParameterValue"),
     /// ]);
     /// ```
-    pub fn execute(self: &AirlyClient, action: &'static str, params: Parameters) -> Response {
+    pub fn execute<T: serde::de::DeserializeOwned>(self: &AirlyClient, action: &'static str, params: Parameters)
+        -> Result<T, models::Error> {
         use reqwest::Url;
 
         // prepare the request URL
@@ -100,6 +103,42 @@ impl AirlyClient {
         }
 
         // execute the request
-        self.client.get(request_url).send().unwrap()
+        let mut response = self.client.get(request_url).send().unwrap();
+
+        match response.status() {
+            // -- if received 200 OK, unserialize like a regular message -- //
+            reqwest::StatusCode::Ok => {
+                let result = response.json::<T>();
+
+                match result {
+                    Ok(result) => Ok(result),
+
+                    // it may happen that we receive a valid response, but nonetheless fail to parse
+                    // it - return a meaningful error message in such case
+                    Err(msg) => Err(
+                        models::Error {
+                            message: format!("Request succeeded, but we failed to parse the response: {}", msg),
+                        }
+                    )
+                }
+            }
+
+            // -- if received any other code, unserialize like an error -- //
+            _ => {
+                let result = response.json::<models::Error>();
+
+                match result {
+                    Ok(result) => Err(result),
+
+                    // it may happen that we receive a completely invalid error message, which is
+                    // not a JSON - return a meaningful error message in such case
+                    Err(msg) => Err(
+                        models::Error {
+                            message: format!("Request failed and additionally we failed to parse the response: {}", msg),
+                        }
+                    )
+                }
+            }
+        }
     }
 }

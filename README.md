@@ -17,7 +17,7 @@ use pwr_airly::AirlyClient;
 
 fn main() {
     let airly = AirlyClient::new("your API key");
-    let sensor = airly.get_nearest_sensor(50.0, 19.0);
+    let sensor = airly.get_nearest_sensor(50.0, 19.0).unwrap();
     
     println!("{:#?}", sensor);
 }
