@@ -27,10 +27,10 @@ fn main() {
 
 Airly Endpoint                       | AirlyClient method
 ------------------------------------ | ------------------
-`GET /v1/sensors`                    | `get_sensor(sensor_id: u32) -> Result<models::sensor::Sensor, models::Error>`
-`GET /v1/nearestSensor/measurements` | `get_nearest_sensor(latitude: f32, longitude: f32) -> Result<models::sensor::Sensor, models::Error>`
-`GET /v1/sensor/measurements`        | `get_sensor_measurements(sensor_id: u32) -> Result<models::measurements::Measurements, models::Error>`
-`GET /v1/mapPoint/measurements`      | `get_map_point_measurements(latitude: f32, longitude: f32) -> Result<models::measurements::Measurements, models::Error>`
+`GET /v1/sensors`                    | `get_sensor(sensor_id: u32) -> Sensor`
+`GET /v1/nearestSensor/measurements` | `get_nearest_sensor(latitude: f32, longitude: f32) -> Sensor`
+`GET /v1/sensor/measurements`        | `get_sensor_measurements(sensor_id: u32) -> Measurements`
+`GET /v1/mapPoint/measurements`      | `get_map_point_measurements(latitude: f32, longitude: f32) -> Measurements`
 
 An insightful reader may notice that my nomenclature slightly differs from the original (Airly's) one - this has been 
 done deliberately, because Airly's endpoints have been named somewhat misleadingly:
