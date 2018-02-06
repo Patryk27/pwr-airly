@@ -19,8 +19,8 @@ pub struct AirlyClient {
 type Parameters<'a> = Vec<(&'static str, &'a String)>;
 
 impl AirlyClient {
-    /// Create a new instance of the Airly Client.
-    /// In order to obtain your own API key, register at https://developer.airly.eu
+    /// Creates a new instance of the Airly Client.
+    /// In order to obtain your own API key, register at <https://developer.airly.eu>.
     ///
     /// # Example
     ///
@@ -36,26 +36,7 @@ impl AirlyClient {
         }
     }
 
-    /// Get a sensor located nearest to given location.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// println!("{:#?}", airly.get_nearest_sensor(50.0, 19.0));
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// May fail when given invalid coordinates or no sensor is found near given location.
-    pub fn get_nearest_sensor(self: &AirlyClient, latitude: f32, longitude: f32)
-        -> Result<models::sensor::Sensor, models::Error> {
-        self.execute("nearestSensor/measurements", vec![
-            ("latitude", &latitude.to_string()),
-            ("longitude", &longitude.to_string()),
-        ])
-    }
-
-    /// Get measurements for a specific sensor.
+    /// Returns measurements for a specific sensor.
     ///
     /// # Example
     ///
@@ -66,15 +47,38 @@ impl AirlyClient {
     ///
     /// # Errors
     ///
-    /// May fail when passed a non-existing sensor's id.
-    pub fn get_sensor_measurements(self: &AirlyClient, sensor_id: u32)
+    /// 1. May fail when passed a non-existing sensor's id.
+    /// 2. May fail when an invalid API key was specified.
+    pub fn get_sensor_measurements(&self, sensor_id: u32)
         -> Result<models::measurements::Measurements, models::Error> {
         self.execute("sensor/measurements", vec![
             ("sensorId", &sensor_id.to_string()),
         ])
     }
 
-    /// Execute request and return response.
+    /// Returns a sensor located nearest to given location.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// println!("{:#?}", airly.get_nearest_sensor(50.0, 19.0).unwrap());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// 1. May fail when given invalid coordinates or no sensor is found near given location.
+    /// 2. May fail when an invalid API key was specified.
+    pub fn get_nearest_sensor(&self, latitude: f32, longitude: f32)
+        -> Result<models::sensor::Sensor, models::Error> {
+        self.execute("nearestSensor/measurements", vec![
+            ("latitude", &latitude.to_string()),
+            ("longitude", &longitude.to_string()),
+        ])
+    }
+
+    /// Executes a generic request and returns its response.
+    /// Provided mainly for internal use, but made public in case someone wants to call own Airly
+    /// function.
     ///
     /// # Example
     ///
