@@ -1,8 +1,8 @@
 extern crate reqwest;
 extern crate serde;
-extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json;
 
 use reqwest::Client;
 use std::borrow::Borrow;
@@ -27,10 +27,11 @@ impl AirlyClient {
     /// ```rust
     /// let airly = AirlyClient::new("my-secret-key");
     /// ```
-    pub fn new(key: &'static str) -> AirlyClient {
+    pub fn new(key: T) -> AirlyClient
+        where T: Into<String> {
         AirlyClient {
             url: "http://airapi.airly.eu/v1".into(),
-            key: String::from(key),
+            key,
 
             client: Client::new(),
         }
