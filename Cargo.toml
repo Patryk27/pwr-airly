@@ -5,7 +5,7 @@ authors = ["Patryk Wychowaniec <wychowaniec.patryk@gmail.com>"]
 license = "MIT"
 version = "0.1.0"
 repository = "https://github.com/Patryk27/pwr-airly"
-maintenance = { status = "experimental" }
+maintenance = { status = "passively-maintained" }
 
 [dependencies]
 reqwest = "0.8"
