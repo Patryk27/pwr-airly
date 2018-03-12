@@ -1,5 +1,5 @@
 [package]
-name = "pwr-airly"
+name = "pwr_airly"
 description = "A simple Rust client for the Airly API (https://developer.airly.eu/docs)"
 authors = ["Patryk Wychowaniec <wychowaniec.patryk@gmail.com>"]
 license = "MIT"
