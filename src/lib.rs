@@ -1,22 +1,37 @@
+/// A simple wrapper for the [Airly](http://developer.airly.eu) API, for version 1.
+/// Build upon [reqwest](https://github.com/seanmonstar/reqwest) & [serde}(https://github.com/serde-rs/serde).
+///
+/// # License
+///
+/// Copyright (c) 2018, Patryk Wychowaniec <wychowaniec.patryk@gmail.com>.
+/// Licensed under the MIT license.
+
 extern crate reqwest;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde_json;
 
 use reqwest::Client;
-use std::borrow::Borrow;
+pub use reqwest::Error as ReqwestError;
+use reqwest::Response;
+use reqwest::Url;
+pub use reqwest::UrlError as ReqwestUrlError;
 
+pub mod error;
+mod internal;
 pub mod models;
 
-pub struct AirlyClient {
-    url: String,
-    key: String,
+type Parameter<'a> = (&'static str, &'a String);
+type Parameters<'a> = Vec<Parameter<'a>>;
 
+const URL: &str = "http://airapi.airly.eu/v1";
+
+pub type Result<T> = ::std::result::Result<T, error::Error>;
+
+pub struct AirlyClient {
+    key: String,
     client: Client,
 }
-
-type Parameters<'a> = Vec<(&'static str, &'a String)>;
 
 impl AirlyClient {
     /// Creates a new instance of the Airly Client.
@@ -29,9 +44,7 @@ impl AirlyClient {
     /// ```
     pub fn new<T: Into<String>>(key: T) -> AirlyClient {
         AirlyClient {
-            url: "http://airapi.airly.eu/v1".into(),
             key: key.into(),
-
             client: Client::new(),
         }
     }
@@ -41,7 +54,7 @@ impl AirlyClient {
     /// # Example
     ///
     /// ```rust
-    /// println!("{:#?}", airly.get_sensor(984));
+    /// println!("{:#?}", airly.get_sensor(984).unwrap());
     /// ```
     ///
     /// # Errors
@@ -49,7 +62,7 @@ impl AirlyClient {
     /// 1. May fail when given invalid sensor id.
     /// 2. May fail when an invalid API key was specified.
     pub fn get_sensor(&self, sensor_id: u32)
-        -> Result<models::sensor::Sensor, models::Error>
+        -> Result<models::sensor::Sensor>
     {
         self.execute(format!("sensors/{}", sensor_id), vec![])
     }
@@ -67,7 +80,7 @@ impl AirlyClient {
     /// 1. May fail when given invalid coordinates or no sensor is found near given location.
     /// 2. May fail when an invalid API key was specified.
     pub fn get_nearest_sensor(&self, latitude: f32, longitude: f32)
-        -> Result<models::sensor::Sensor, models::Error> {
+        -> Result<models::sensor::Sensor> {
         self.execute("nearestSensor/measurements".to_string(), vec![
             ("latitude", &latitude.to_string()),
             ("longitude", &longitude.to_string()),
@@ -79,7 +92,7 @@ impl AirlyClient {
     /// # Example
     ///
     /// ```rust
-    /// println!("{:#?}", airly.get_sensor_measurements(984));
+    /// println!("{:#?}", airly.get_sensor_measurements(984).unwrap());
     /// ```
     ///
     /// # Errors
@@ -87,7 +100,7 @@ impl AirlyClient {
     /// 1. May fail when passed a non-existing sensor's id.
     /// 2. May fail when an invalid API key was specified.
     pub fn get_sensor_measurements(&self, sensor_id: u32)
-        -> Result<models::measurements::Measurements, models::Error> {
+        -> Result<models::measurements::Measurements> {
         self.execute("sensor/measurements".to_string(), vec![
             ("sensorId", &sensor_id.to_string()),
         ])
@@ -98,7 +111,7 @@ impl AirlyClient {
     /// # Example
     ///
     /// ```rust
-    /// println!("{:#?}", airly.get_map_point_measurements(50.06, 19.93));
+    /// println!("{:#?}", airly.get_map_point_measurements(50.06, 19.93).unwrap());
     /// ```
     ///
     /// # Errors
@@ -106,7 +119,7 @@ impl AirlyClient {
     /// 1. May fail when passed an invalid coordinates.
     /// 2. May fail when an invalid API key was specified.
     pub fn get_map_point_measurements(&self, latitude: f32, longitude: f32)
-        -> Result<models::measurements::Measurements, models::Error> {
+        -> Result<models::measurements::Measurements> {
         self.execute("mapPoint/measurements".to_string(), vec![
             ("latitude", &latitude.to_string()),
             ("longitude", &longitude.to_string()),
@@ -114,8 +127,6 @@ impl AirlyClient {
     }
 
     /// Executes a generic request and returns its response.
-    /// Provided mainly for internal use, but made public in case someone wants to call own Airly
-    /// function.
     ///
     /// # Example
     ///
@@ -125,61 +136,15 @@ impl AirlyClient {
     ///   ("secondParameter", "secondParameterValue"),
     /// ]);
     /// ```
-    pub fn execute<T: serde::de::DeserializeOwned>(self: &AirlyClient, action: String, params: Parameters)
-        -> Result<T, models::Error> {
-        use reqwest::Url;
+    fn execute<T>(self: &AirlyClient, action: String, parameters: Parameters) -> Result<T>
+        where T: serde::de::DeserializeOwned {
+        // build a request
+        let request = self.build_request(action, parameters)?;
 
-        // prepare the request URL
-        let mut request_url = Url::parse(format!("{}/{}", self.url, action).borrow()).unwrap();
+        // execute it
+        let mut response = self.client.get(request).send()?;
 
-        // prepare the request parameters
-        {
-            let mut request_params = request_url.query_pairs_mut();
-
-            for param in params {
-                request_params.append_pair(param.0, param.1);
-            }
-
-            request_params.append_pair("apikey", &self.key);
-        }
-
-        // execute the request
-        let mut response = self.client.get(request_url).send().unwrap();
-
-        match response.status() {
-            // -- if received 200 OK, unserialize like a regular message -- //
-            reqwest::StatusCode::Ok => {
-                let result = response.json::<T>();
-
-                match result {
-                    Ok(result) => Ok(result),
-
-                    // it may happen that we receive a valid response, but nonetheless fail to parse
-                    // it - return a meaningful error message in such case
-                    Err(msg) => Err(
-                        models::Error {
-                            message: format!("Request succeeded, but we failed to parse the response: {}", msg),
-                        }
-                    )
-                }
-            }
-
-            // -- if received any other code, unserialize like an error -- //
-            _ => {
-                let result = response.json::<models::Error>();
-
-                match result {
-                    Ok(result) => Err(result),
-
-                    // it may happen that we receive a completely invalid error message, which is
-                    // not a JSON - return a meaningful error message in such case
-                    Err(msg) => Err(
-                        models::Error {
-                            message: format!("Request failed and additionally we failed to parse the response: {}", msg),
-                        }
-                    )
-                }
-            }
-        }
+        // and, eventually, parse the response
+        AirlyClient::parse_response(&mut response)
     }
 }
