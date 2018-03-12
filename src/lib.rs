@@ -27,11 +27,10 @@ impl AirlyClient {
     /// ```rust
     /// let airly = AirlyClient::new("my-secret-key");
     /// ```
-    pub fn new(key: T) -> AirlyClient
-        where T: Into<String> {
+    pub fn new<T: Into<String>>(key: T) -> AirlyClient {
         AirlyClient {
             url: "http://airapi.airly.eu/v1".into(),
-            key,
+            key: key.into(),
 
             client: Client::new(),
         }
