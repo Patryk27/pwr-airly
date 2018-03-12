@@ -28,7 +28,16 @@ impl AirlyClient {
             // when we've received "200 OK", un-json the response like a regular, correct one
             reqwest::StatusCode::Ok => Ok(response.json::<T>()?),
 
-            // when we've received any other code, un-json the response like an error
+            // provide a special case for the "404 Not Found" responses
+            reqwest::StatusCode::NotFound => Err(
+                error::Error::ApiError(
+                    models::error::Error {
+                        message: format!("Request at URL [{}] returned 404.", response.url()),
+                    }
+                )
+            ),
+
+            // when we've received any other code, un-json the response like an API error
             _ => Err(
                 error::Error::ApiError(
                     response.json::<models::error::Error>()?
