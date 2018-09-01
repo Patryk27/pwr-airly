@@ -6,7 +6,7 @@ pwr_airly
 [Documentation](https://docs.rs/pwr_airly)
 
 [Airly](https://airly.eu/pl/) has made a pretty nice weather-sensors API, which I'm using in my own project - I thought
-I'd give a shot and try to create a wrapper someone else would also consider useful.  
+I'd give a shot and try to create a client someone else would also consider useful.  
 
 tl;dr This library is a simple, unofficial Rust client for the [Airly API](https://developer.airly.eu/docs). 
 
