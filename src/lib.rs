@@ -5,6 +5,7 @@
 /// Copyright (c) 2018, Patryk Wychowaniec <wychowaniec.patryk@gmail.com>.
 /// Licensed under the MIT license.
 
+extern crate chrono;
 #[macro_use]
 extern crate hyper;
 extern crate reqwest;
@@ -12,14 +13,19 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
-use client::Client;
 use installations::InstallationsClient;
+use measurements::MeasurementsClient;
 
-mod installations;
+#[macro_use]
+mod macros;
+
 mod client;
+mod installations;
+mod measurements;
 
 pub struct AirlyClient {
-    installations_client: InstallationsClient,
+    installations: InstallationsClient,
+    measurements: MeasurementsClient,
 }
 
 /**
@@ -43,16 +49,24 @@ impl AirlyClient {
     /// let airly = AirlyClient::new("my-secret-key");
     /// ```
     pub fn new<K: Into<String>>(key: K) -> AirlyClient {
-        let client = Client::new(
-            key.into()
-        );
+        let key = key.into();
 
         AirlyClient {
-            installations_client: InstallationsClient::new(client),
+            installations: InstallationsClient::new(
+                key.clone()
+            ),
+
+            measurements: MeasurementsClient::new(
+                key.clone()
+            ),
         }
     }
 
     pub fn installations(&self) -> &InstallationsClient {
-        &self.installations_client
+        &self.installations
+    }
+
+    pub fn measurements(&self) -> &MeasurementsClient {
+        &self.measurements
     }
 }
