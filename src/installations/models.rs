@@ -1,38 +1,38 @@
 airly_model! {
-    pub struct Installation {
-        pub id: u32,
-        pub elevation: f32,
-        pub airly: bool,
+    Installation {
+        id: u32,
+        elevation: f32,
+        airly: bool,
 
-        pub location: InstallationLocation,
-        pub address: InstallationAddress,
-        pub sponsor: InstallationSponsor,
+        location: InstallationLocation,
+        address: InstallationAddress,
+        sponsor: InstallationSponsor,
     }
 }
 
 airly_model! {
-    pub struct InstallationLocation {
-        pub latitude: f32,
-        pub longitude: f32,
+    InstallationLocation {
+        latitude: f32,
+        longitude: f32,
     }
 }
 
 airly_model! {
-    pub struct InstallationAddress {
-        pub country: String,
-        pub city: String,
-        pub street: String,
-        pub number: String,
-        pub display_address1: String,
-        pub display_address2: String,
+    InstallationAddress {
+        country: String,
+        city: String,
+        street: String,
+        number: String,
+        display_address1: String,
+        display_address2: String,
     }
 }
 
 airly_model! {
-    pub struct InstallationSponsor {
-        pub name: String,
-        pub description: String,
-        pub logo: String,
-        pub link: Option<String>,
+    InstallationSponsor {
+        name: String,
+        description: String,
+        logo: String,
+        link: Option<String>,
     }
 }

@@ -1,8 +1,7 @@
-pub(crate) use reqwest::Client as HttpClient;
-pub(crate) use reqwest::Method as HttpMethod;
-pub(crate) use reqwest::StatusCode as HttpStatusCode;
-use serde::de::DeserializeOwned;
-use super::{API_URL, ApiKey, Error, Result};
+use client::{request_builder::RequestBuilder, Response, response_parser::ResponseParser, Result};
+use models::Model;
+use reqwest::Client as HttpClient;
+use reqwest::Method as HttpMethod;
 
 pub struct Client {
     key: String,
@@ -48,58 +47,19 @@ impl Client {
     ///
     /// println!("{:#?}", response);
     /// ```
-    pub fn request<T: DeserializeOwned>(&self, method: HttpMethod, url: String) -> Result<T> {
-        // Start building the request
-        let mut request = self.http.request(
-            method,
-            &format!("{}/{}", API_URL, url),
-        );
+    pub fn request<T: Model>(&self, method: HttpMethod, url: String) -> Result<Response<T>> {
+        // Build the request
+        let mut request_builder = RequestBuilder::new();
 
-        // Include the "ApiKey" header
-        request.header(
-            ApiKey(self.key.clone())
-        );
+        request_builder.set_method(method);
+        request_builder.set_url(url);
+        request_builder.set_key(self.key.clone());
 
-        // Execute the request
-        let mut response = request.send()?;
+        let mut request = request_builder.build(&self.http);
 
-        // Parse the response
-        match response.status() {
-            // HTTP 200 - Ok
-            HttpStatusCode::Ok => response.json()
-                .map_err(|error| {
-                    Error::Unknown(
-                        format!("Failed to parse the response's JSON - this shouldn't happen. Error message: {}", error)
-                    )
-                }),
-
-            // HTTP 401 - Unauthorized or HTTP 403 - Forbidden
-            HttpStatusCode::Unauthorized | HttpStatusCode::Forbidden => Err(
-                Error::InvalidKey(
-                    response.json()?,
-                ),
-            ),
-
-            // HTTP 404 - Not Found
-            HttpStatusCode::NotFound => Err(
-                Error::ResourceNotFound(
-                    response.json()?
-                ),
-            ),
-
-            // HTTP 429 - Too Many Requests
-            HttpStatusCode::TooManyRequests => Err(
-                Error::TooManyRequests(
-                    response.json()?
-                ),
-            ),
-
-            // If API's returned other status code, bail out
-            _ => Err(
-                Error::Unknown(
-                    format!("API has returned an unrecognized HTTP status code: [{}].", response.status())
-                )
-            )
-        }
+        // Execute it & parse the response
+        ResponseParser::parse(
+            &mut request.send()?
+        )
     }
 }

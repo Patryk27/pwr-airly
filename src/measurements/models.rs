@@ -1,50 +1,50 @@
 use chrono::{DateTime, Utc};
 
 airly_model! {
-    pub struct Measurements {
-        pub current: Measurement,
-        pub history: Vec<Measurement>,
-        pub forecast: Vec<Measurement>,
+    Measurements {
+        current: Measurement,
+        history: Vec<Measurement>,
+        forecast: Vec<Measurement>,
     }
 }
 
 airly_model! {
-    pub struct Measurement {
+    Measurement {
         #[serde(rename = "from_date_time")]
-        pub from: Option<DateTime<Utc>>,
+        from: Option<DateTime<Utc>>,
 
         #[serde(rename = "till_date_time")]
-        pub till: Option<DateTime<Utc>>,
+        till: Option<DateTime<Utc>>,
 
-        pub values: Vec<MeasurementValue>,
-        pub indexes: Vec<MeasurementIndex>,
-        pub standards: Vec<MeasurementStandard>,
+        values: Vec<MeasurementValue>,
+        indexes: Vec<MeasurementIndex>,
+        standards: Vec<MeasurementStandard>,
     }
 }
 
 airly_model! {
-    pub struct MeasurementValue {
-        pub name: String,
-        pub value: f32,
+    MeasurementValue {
+        name: String,
+        value: f32,
     }
 }
 
 airly_model! {
-    pub struct MeasurementIndex {
-        pub name: String,
-        pub value: Option<f32>,
-        pub level: Option<String>,
-        pub description: Option<String>,
-        pub advice: Option<String>,
-        pub color: Option<String>,
+    MeasurementIndex {
+        name: String,
+        value: Option<f32>,
+        level: Option<String>,
+        description: Option<String>,
+        advice: Option<String>,
+        color: Option<String>,
     }
 }
 
 airly_model! {
-    pub struct MeasurementStandard {
-        pub name: String,
-        pub pollutant: String,
-        pub limit: f32,
-        pub percent: f32,
+    MeasurementStandard {
+        name: String,
+        pollutant: String,
+        limit: f32,
+        percent: f32,
     }
 }

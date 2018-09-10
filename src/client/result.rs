@@ -1,8 +1,8 @@
+use client::ErrorContext;
 use reqwest;
 use std::result;
-use super::ErrorContext;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Error {
     // Returned when user's API key is invalid / expired.
     InvalidKey(ErrorContext),

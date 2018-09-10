@@ -17,7 +17,7 @@ use installations::InstallationsClient;
 use measurements::MeasurementsClient;
 
 #[macro_use]
-mod macros;
+mod models;
 
 mod client;
 mod installations;

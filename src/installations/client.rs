@@ -1,5 +1,5 @@
-use client::{Client, HttpMethod, Result};
-use super::models::*;
+use client::{Client, HttpMethod, Response, Result};
+use installations::models::*;
 
 pub struct InstallationsClient {
     client: Client,
@@ -20,11 +20,11 @@ impl InstallationsClient {
     ///
     /// ```rust
     /// let client = InstallationsClient::new("my-secret-key");
-    /// let installation = client.get(100);
+    /// let response = client.get(100);
     ///
-    /// println!("{:#?}", installation);
+    /// println!("{:#?}", response?.model());
     /// ```
-    pub fn get(&self, id: u32) -> Result<Installation> {
+    pub fn get(&self, id: u32) -> Result<Response<Installation>> {
         self.client.request(
             HttpMethod::Get,
             format!("installations/{}", id),
@@ -40,9 +40,11 @@ impl InstallationsClient {
     ///
     /// ```rust
     /// let client = InstallationsClient::new("my-secret-key");
-    /// let installations = client.get_nearest(50.062006, 19.940984);
+    /// let response = client.get_nearest(50.062006, 19.940984);
+    ///
+    /// println!("{:#?}", response?.model());
     /// ```
-    pub fn get_nearest(&self, lat: f32, lng: f32) -> Result<Vec<Installation>> {
+    pub fn get_nearest(&self, lat: f32, lng: f32) -> Result<Response<Vec<Installation>>> {
         self.client.request(
             HttpMethod::Get,
             format!("installations/nearest?lat={}&lng={}", lat, lng),
