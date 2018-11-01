@@ -5,7 +5,7 @@ pwr_airly
 
 [Documentation](https://docs.rs/pwr_airly)
 
-
+This branch contains a work-in-progress client for the Airly's v2 API.
 
 # License
 

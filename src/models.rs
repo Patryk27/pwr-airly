@@ -19,14 +19,13 @@ macro_rules! airly_model {
         }
 
         impl ::models::Model for $name {
-            // Nottin' here - it's just a marker defining that this struct is in fact an Airly
-            // model.
+            // Nottin' here - it functions as a marker only
         }
     )
 }
 
 pub trait Model: Clone + DeserializeOwned {
-    // Nottin' here
+    // Nottin' here - it functions as a marker only
 }
 
 // A vector of models is still considered a model.
@@ -34,5 +33,5 @@ pub trait Model: Clone + DeserializeOwned {
 // It allows to neatly organize all the actions that return a vector of models instead of a single
 // model (e.g. "get nearest installations").
 impl<T: Model> Model for Vec<T> {
-    // Nottin' here
+    // Nottin' here - it functions as a marker only
 }

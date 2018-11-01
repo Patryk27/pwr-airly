@@ -1,6 +1,6 @@
 [package]
 name = "pwr_airly"
-description = "A simple Rust client for the Airly API (https://developer.airly.eu/docs)"
+description = "An unofficial Rust client for the Airly API (https://developer.airly.eu/docs)"
 authors = ["Patryk Wychowaniec <wychowaniec.patryk@gmail.com>"]
 license = "MIT"
 version = "0.2.0"
@@ -8,8 +8,7 @@ repository = "https://github.com/Patryk27/pwr-airly"
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
-hyper = "0.11"
-reqwest = "0.8"
+reqwest = "0.9"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"

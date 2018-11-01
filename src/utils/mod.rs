@@ -1,12 +1,13 @@
-pub(crate) use reqwest::Method as HttpMethod;
-pub use self::client::*;
+pub(crate) use self::client::*;
+pub use self::error::*;
 pub use self::models::*;
 pub use self::response::*;
+pub(crate) use self::response_parser::*;
 pub use self::result::*;
 
 mod client;
+mod error;
 mod models;
-mod request_builder;
 mod response;
 mod response_parser;
 mod result;
