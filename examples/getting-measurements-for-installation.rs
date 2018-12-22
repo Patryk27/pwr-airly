@@ -1,19 +1,3 @@
-pwr_airly
----------
-
-[![Version](https://img.shields.io/crates/v/pwr_airly.svg)](https://crates.io/crates/pwr_airly)
-[Documentation](https://docs.rs/pwr_airly)
-
-`pwr_airly` is an unofficial client for the [Airly's v2 API](https://developer.airly.eu/docs).
-
-# Examples
-
-A few examples are ready for you inside the `examples` directory - just replace the `my-api-key` string with your
-actual key and you'll be able to run them with `cargo run --example example-name`.
-
-As for a sneak peek, here's the `getting-measurements-for-installation.rs`:
-
-```rust
 use std::error::Error;
 use std::result::Result;
 
@@ -34,16 +18,3 @@ fn main() -> Result<(), Box<Error>> {
 
     Ok(())
 }
-```
-
-# Roadmap
-
-1. Implement all the `/v2/meta` endpoints.
-2. Add support for asynchronous requests.
-
-# License
-
-```
-Copyright (c) 2018, Patryk Wychowaniec <wychowaniec.patryk@gmail.com>.
-Licensed under the MIT license.
-```
