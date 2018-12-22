@@ -1,8 +1,7 @@
-extern crate pwr_airly;
-
-use pwr_airly::AirlyClient;
 use std::error::Error;
 use std::result::Result;
+
+use pwr_airly::AirlyClient;
 
 fn main() -> Result<(), Box<Error>> {
     let airly = AirlyClient::new("my-api-key");

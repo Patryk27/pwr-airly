@@ -1,8 +1,10 @@
 use reqwest::Method as HttpMethod;
+
+use crate::client::Client;
+use crate::client::Response;
+use crate::client::Result;
+
 pub use self::models::*;
-use utils::Client;
-use utils::Response;
-use utils::Result;
 
 mod models;
 

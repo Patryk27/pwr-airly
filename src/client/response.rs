@@ -1,5 +1,5 @@
-use models::Model;
-use utils::RateLimit;
+use crate::client::RateLimit;
+use crate::models::Model;
 
 #[derive(Clone, Debug)]
 pub struct Response<T: Model> {

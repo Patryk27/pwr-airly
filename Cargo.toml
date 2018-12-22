@@ -1,14 +1,15 @@
 [package]
-name = "pwr_airly"
-description = "An unofficial Rust client for the Airly API (https://developer.airly.eu/docs)"
 authors = ["Patryk Wychowaniec <wychowaniec.patryk@gmail.com>"]
+description = "An unofficial Rust client for the Airly's API (https://developer.airly.eu/docs)"
+edition = "2018"
 license = "MIT"
-version = "0.2.0"
+name = "pwr_airly"
 repository = "https://github.com/Patryk27/pwr-airly"
+version = "0.2.0"
 
 [dependencies]
-chrono = { version = "0.4", features = ["serde"] }
-reqwest = "0.9"
-serde = "1.0"
-serde_json = "1.0"
-serde_derive = "1.0"
+chrono = { version = "0.4.6", features = ["serde"] }
+reqwest = "0.9.5"
+serde = "1.0.82"
+serde_json = "1.0.33"
+serde_derive = "1.0.82"

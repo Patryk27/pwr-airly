@@ -1,25 +1,21 @@
-/// An unofficial client for the [Airly](http://developer.airly.eu) v2 API.
+/// An unofficial client for the [Airly's v2 API](http://developer.airly.eu).
 ///
 /// # License
 ///
 /// Copyright (c) 2018, Patryk Wychowaniec <wychowaniec.patryk@gmail.com>.
 /// Licensed under the MIT license.
-
-extern crate chrono;
-extern crate reqwest;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
-use installations::InstallationsClient;
-use measurements::MeasurementsClient;
+use self::installations::InstallationsClient;
+use self::measurements::MeasurementsClient;
 
 #[macro_use]
 mod models;
 
+mod client;
 mod installations;
 mod measurements;
-mod utils;
 
 pub struct AirlyClient {
     installations: InstallationsClient,
@@ -29,8 +25,8 @@ pub struct AirlyClient {
 impl AirlyClient {
     /// Creates a new instance of the `AirlyClient`.
     ///
-    /// To create an instance you'll need your own API key, which you can obtain by registering at
-    /// <https://developer.airly.eu> (it's free!).
+    /// To connect to the Airly's API you'll need your own API key, which you can obtain by
+    /// registering at <https://developer.airly.eu> (it's free!).
     ///
     /// # Example
     ///

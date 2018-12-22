@@ -18,20 +18,16 @@ macro_rules! airly_model {
             )*
         }
 
-        impl ::models::Model for $name {
-            // Nottin' here - it functions as a marker only
+        impl crate::models::Model for $name {
+            // Nottin' here - it's a marker-trait
         }
     )
 }
 
 pub trait Model: Clone + DeserializeOwned {
-    // Nottin' here - it functions as a marker only
+    // Nottin' here - it's a marker-trait
 }
 
-// A vector of models is still considered a model.
-//
-// It allows to neatly organize all the actions that return a vector of models instead of a single
-// model (e.g. "get nearest installations").
-impl<T: Model> Model for Vec<T> {
-    // Nottin' here - it functions as a marker only
-}
+/// A vector of models is still considered a model - it allows us to neatly organize all the actions
+/// that return a vector of models.
+impl<T: Model> Model for Vec<T> {}
